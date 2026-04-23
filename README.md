@@ -74,6 +74,14 @@ jupyter lab demo.ipynb
 - Per-type system prompts (see `src/sabre/prompts.py`) with prompt-cache `cache_control` — repeat calls are cheap.
 - Serialization lives in `src/sabre/serialize.py`. Each branch there is a type dispatch — add a new `isinstance` check + a text/image payload to teach it a new object type.
 
+<img width="1185" height="642" alt="Screenshot 2026-04-22 at 9 54 55 PM" src="https://github.com/user-attachments/assets/ea99f345-989e-40b4-8594-72031bafa57f" />
+
+<img width="1171" height="719" alt="Screenshot 2026-04-22 at 9 55 54 PM" src="https://github.com/user-attachments/assets/7005b944-509a-4e2e-9ab5-891fce17f2ae" />
+
+
+
+
+
 ## Configuration
 
 ```python
