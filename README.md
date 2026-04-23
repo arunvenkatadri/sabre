@@ -1,5 +1,7 @@
 # sabre
 
+<img width="1774" height="887" alt="image" src="https://github.com/user-attachments/assets/000cf19e-2d25-4adb-a0bb-9407e8d1bf45" />
+
 Explain Jupyter cell outputs with Claude — plots, DataFrames, tracebacks, arrays.
 
 Most notebook AI tools (Jupyter AI, Copilot, Pretzel) focus on the *code*. `sabre` is the opposite: it looks at what your cell *produced* and narrates it. What does this chart actually show? Why does this DataFrame look weird? What broke in this traceback?
