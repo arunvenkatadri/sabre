@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ailab.serialize import serialize
+from sabre.serialize import serialize
 
 
 def test_dataframe():
