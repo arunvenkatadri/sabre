@@ -117,7 +117,10 @@ def explain(obj: Any = None, *, model: str = DEFAULT_MODEL, max_tokens: int = 20
     except Exception:
         extra = None
 
-    return _run(payload, model=model, max_tokens=max_tokens, extra_context=extra)
+    from .packs import pack_addendum_for
+    suffix = pack_addendum_for(payload.kind)
+
+    return _run(payload, model=model, max_tokens=max_tokens, system_suffix=suffix, extra_context=extra)
 
 
 def explain_diff(a: Any, b: Any, *, model: str = DEFAULT_MODEL, max_tokens: int = 2048):
@@ -127,4 +130,6 @@ def explain_diff(a: Any, b: Any, *, model: str = DEFAULT_MODEL, max_tokens: int 
     Falls back to a repr-based diff for unknown types.
     """
     payload = serialize_diff(a, b)
-    return _run(payload, model=model, max_tokens=max_tokens)
+    from .packs import pack_addendum_for
+    suffix = pack_addendum_for(payload.kind)
+    return _run(payload, model=model, max_tokens=max_tokens, system_suffix=suffix)

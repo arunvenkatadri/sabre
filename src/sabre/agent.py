@@ -84,10 +84,12 @@ def _stream_with_suggestions(
     model: str,
     max_tokens: int,
 ) -> tuple[str, list[Suggestion]]:
+    from .packs import pack_addendum_for
+
     client = _get_client()
     system = [{
         "type": "text",
-        "text": system_for(payload.kind) + SUGGEST_SUFFIX,
+        "text": system_for(payload.kind) + pack_addendum_for(payload.kind) + SUGGEST_SUFFIX,
         "cache_control": {"type": "ephemeral"},
     }]
 
