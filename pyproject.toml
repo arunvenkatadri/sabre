@@ -13,7 +13,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "pandas", "matplotlib", "numpy"]
+dev = ["pytest>=7", "pandas", "matplotlib", "numpy", "nbformat", "ipywidgets"]
+export = ["nbformat", "nbclient"]
+agent = ["ipywidgets"]
+
+[project.scripts]
+sabre = "sabre.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sabre"]

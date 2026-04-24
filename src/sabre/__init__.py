@@ -1,6 +1,17 @@
-from .core import explain
+from .agent import explain_and_suggest
+from .core import explain, explain_diff
+from .session import disable_memory, enable_memory, recap, reset_memory
 
-__all__ = ["explain", "load_ipython_extension"]
+__all__ = [
+    "explain",
+    "explain_diff",
+    "explain_and_suggest",
+    "enable_memory",
+    "disable_memory",
+    "recap",
+    "reset_memory",
+    "load_ipython_extension",
+]
 
 
 def load_ipython_extension(ipython):
