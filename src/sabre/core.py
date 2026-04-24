@@ -6,8 +6,9 @@ from typing import Any
 
 import anthropic
 
+from .diff import serialize_diff
 from .prompts import system_for
-from .serialize import serialize
+from .serialize import Payload, serialize
 
 DEFAULT_MODEL = "claude-opus-4-7"
 _client: anthropic.Anthropic | None = None
@@ -45,27 +46,35 @@ def _get_last_output() -> Any:
     return out
 
 
-def explain(obj: Any = None, *, model: str = DEFAULT_MODEL, max_tokens: int = 2048):
-    """Explain a Jupyter cell output (DataFrame, plot, traceback, ...) using Claude.
+def _run(
+    payload: Payload,
+    *,
+    model: str,
+    max_tokens: int,
+    system_suffix: str = "",
+    extra_context: str | None = None,
+) -> str | None:
+    """Stream an explanation for `payload` and render it in-notebook.
 
-    With no argument, explains the last cell output. Returns a Markdown display
-    object that renders in the notebook.
+    Returns the full text when not attached to IPython, else None.
     """
-    if obj is None:
-        obj = _get_last_output()
-
-    payload = serialize(obj)
     client = _get_client()
 
+    system_text = system_for(payload.kind) + system_suffix
     system = [{
         "type": "text",
-        "text": system_for(payload.kind),
+        "text": system_text,
         "cache_control": {"type": "ephemeral"},
     }]
+    if extra_context:
+        system.append({
+            "type": "text",
+            "text": extra_context,
+            "cache_control": {"type": "ephemeral"},
+        })
 
-    # Stream so long explanations render progressively and don't trip HTTP timeouts.
     try:
-        from IPython.display import Markdown, display, update_display
+        from IPython.display import Markdown, display
         display_handle = display(Markdown("_thinking..._"), display_id=True)
     except ImportError:
         display_handle = None
@@ -86,7 +95,36 @@ def explain(obj: Any = None, *, model: str = DEFAULT_MODEL, max_tokens: int = 20
 
     result = "".join(chunks)
     if display_handle is None:
-        # Non-IPython fallback — just return the string.
         return result
-    # Already displayed; return nothing so Jupyter doesn't render it twice.
     return None
+
+
+def explain(obj: Any = None, *, model: str = DEFAULT_MODEL, max_tokens: int = 2048):
+    """Explain a Jupyter cell output (DataFrame, plot, traceback, ...) using Claude.
+
+    With no argument, explains the last cell output. Returns a Markdown display
+    object that renders in the notebook.
+    """
+    if obj is None:
+        obj = _get_last_output()
+
+    payload = serialize(obj)
+
+    # Inject rolling notebook context if the session has accumulated any.
+    try:
+        from .session import current_context_block
+        extra = current_context_block()
+    except Exception:
+        extra = None
+
+    return _run(payload, model=model, max_tokens=max_tokens, extra_context=extra)
+
+
+def explain_diff(a: Any, b: Any, *, model: str = DEFAULT_MODEL, max_tokens: int = 2048):
+    """Compare two outputs and narrate what changed.
+
+    Dispatches on the pair's types (DataFrame/Series/ndarray/Figure/Exception).
+    Falls back to a repr-based diff for unknown types.
+    """
+    payload = serialize_diff(a, b)
+    return _run(payload, model=model, max_tokens=max_tokens)

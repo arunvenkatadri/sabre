@@ -48,8 +48,29 @@ GENERIC = (
     "likely is and what's noteworthy about it."
 )
 
+DIFF = (
+    BASE + " You are comparing two outputs, A (before) and B (after). Lead "
+    "with what changed and whether that change looks expected or suspicious. "
+    "Skip things that are the same on both sides. Be specific: name the "
+    "columns, values, or regions that moved. If nothing meaningful changed, "
+    "say so in one sentence."
+)
+
+SUGGEST_SUFFIX = (
+    "\n\nAfter your narration, on a new line, emit a fenced code block "
+    "tagged `sabre-suggestions` containing a JSON array of up to 3 next "
+    "steps the user could take to investigate further. Each entry must be "
+    '{"title": str, "code": str, "rationale": str} where `code` is a single '
+    "Python snippet that can be pasted into a new notebook cell and run "
+    "against the same namespace. Prefer short, self-contained snippets. "
+    "Do NOT include suggestions that import new packages, touch the "
+    "filesystem, or make network calls."
+)
+
 
 def system_for(kind: str) -> str:
+    if kind.startswith("diff_"):
+        return DIFF
     return {
         "dataframe": DATAFRAME,
         "series": SERIES,
